@@ -1,4 +1,3 @@
-
 # Blockchain com Golang
 Por conta de um trabalho freelancer que peguei recentemente me deparei com o seguinte problema: 
 > "Cada transação deve ser registrada no banco de dados de forma permanente e tenho que garantir que após a inserção esses registros não foram alterados"
@@ -182,6 +181,13 @@ Aqui utilizamos a função `HasPrefix` da biblioteca `bytes` para verificar se o
 A linha `fmt.Println(block)` é apenas para debug e pode ser removida.
 
 **Checa a integridade da cadeia**
+A integridade da cadeia faz duas verificações:
+* Se o hash do bloco esta correto e representa seu conteúdo, `bytes.Compare(dbChain[i].Hash, dbChain[i].DoHash())`; e
+* Se o bloco referencia corretamente o bloco anterior, `bytes.Compare(dbChain[i].LastHash, dbChain[i-1].Hash)  !=  0`.
+
+Como não é possível verificar o hash do bloco anterior para o primeiro bloco nós pulamos ele, `ìf i>0`
+Note que para comparar duas cadeia de bytes, `[]byte` utilizamos a função `Compare` da biblioteca `bytes`, não é possível fazer a verificação diretamente `dbChain[i].LastHash != dbChain[i-1].Hash` pois teríamos um erro.
+A função `Compare` recebe como argumento as duas cadeias de bytes que queremos comparar e retorna 0 se forem iguais, -1 se a primeira for menos  que a segunda, ou 1 se a primeira for maior.
 ```go
 // Checa a integridade da cadeia
 func (bc *Blockchain) IsIntegre() bool{
@@ -204,3 +210,7 @@ func (bc *Blockchain) IsIntegre() bool{
   return true
 }
 ```
+
+## Referênias
+Esse código foi baseado no vídeo *Creating a blockchain with javascript* de [Simply Explained - Savjee](https://www.youtube.com/channel/UCnxrdFPXJMeHru_b4Q_vTPQ), Publicado em 18 de jul de 2017
+https://youtu.be/zVqczFZr124
